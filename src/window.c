@@ -46,6 +46,10 @@ bool initializeWindow(void)
 		SDL_Quit();
 		return false;
 	}
+	else
+	{
+		printf("SDL window created successfully.\n");
+	}
 
 	renderer = SDL_CreateRenderer(
 		window,
@@ -60,6 +64,10 @@ bool initializeWindow(void)
 		SDL_Quit();
 		return false;
 	}
+	else
+	{
+		printf("SDL renderer created successfully.\n");
+	}
 
 	if (SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND) != 0)
 	{
@@ -68,6 +76,10 @@ bool initializeWindow(void)
 		SDL_DestroyWindow(window);
 		SDL_Quit();
 		return false;
+	}
+	else
+	{
+		printf("SDL blend mode set successfully.\n");
 	}
 
 	colorBuffer = malloc(sizeof(color_t) * SCREEN_WIDTH * SCREEN_HEIGHT);
@@ -78,6 +90,10 @@ bool initializeWindow(void)
 		SDL_DestroyWindow(window);
 		SDL_Quit();
 		return false;
+	}
+	else
+	{
+		printf("Color buffer allocated successfully.\n");
 	}
 
 	colorBufferTexture = SDL_CreateTexture(
@@ -97,9 +113,14 @@ bool initializeWindow(void)
 		SDL_Quit();
 		return false;
 	}
+	else
+	{
+		printf("SDL texture created successfully.\n");
+	}
 
 	return true;
 }
+
 
 
 /**
