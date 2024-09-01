@@ -11,31 +11,27 @@ static int horzWallContent, vertWallContent;
  * horzIntersection - Finds horizontal intersection with the wall
  * @rayAngle: current ray angle
  */
+
 void horzIntersection(float rayAngle)
 {
-    // Initialize intersection flags and coordinates
+    float nextHorzTouchX, nextHorzTouchY, xintercept, yintercept, xstep, ystep;
+
     foundHorzWallHit = false;
     horzWallHitX = horzWallHitY = horzWallContent = 0;
 
-    // Calculate the initial horizontal intercept
     yintercept = floor(player.y / TILE_SIZE) * TILE_SIZE;
-    if (isRayFacingDown(rayAngle)) {
-        yintercept += TILE_SIZE;
-    }
+    yintercept += isRayFacingDown(rayAngle) ? TILE_SIZE : 0;
+
     xintercept = player.x + (yintercept - player.y) / tan(rayAngle);
 
-    // Calculate the step size for each iteration
-    ystep = TILE_SIZE * (isRayFacingUp(rayAngle) ? -1 : 1);
+    ystep = TILE_SIZE;
+    ystep *= isRayFacingUp(rayAngle) ? -1 : 1;
     xstep = TILE_SIZE / tan(rayAngle);
-    if ((isRayFacingLeft(rayAngle) && xstep > 0) || (isRayFacingRight(rayAngle) && xstep < 0)) {
-        xstep = -xstep;
-    }
-
-    // Initialize the first point of intersection
+    xstep *= (isRayFacingLeft(rayAngle) && xstep > 0) ? -1 : 1;
+    xstep *= (isRayFacingRight(rayAngle) && xstep < 0) ? -1 : 1;
     nextHorzTouchX = xintercept;
     nextHorzTouchY = yintercept;
 
-    // Iterate until a wall is hit or the ray leaves the map boundaries
     while (isInsideMap(nextHorzTouchX, nextHorzTouchY))
     {
         float xToCheck = nextHorzTouchX;
@@ -45,16 +41,15 @@ void horzIntersection(float rayAngle)
         {
             horzWallHitX = nextHorzTouchX;
             horzWallHitY = nextHorzTouchY;
-            horzWallContent = getMapValue((int)floor(yToCheck / TILE_SIZE), (int)floor(xToCheck / TILE_SIZE));
+            horzWallContent = getMapValue((int)floor(yToCheck / TILE_SIZE),
+                                       (int)floor(xToCheck / TILE_SIZE));
             foundHorzWallHit = true;
             break;
         }
-        
         nextHorzTouchX += xstep;
         nextHorzTouchY += ystep;
     }
 }
-
 
 /**
  * vertIntersection - Finds vertical intersection with the wall
