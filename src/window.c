@@ -15,14 +15,22 @@ bool initializeWindow(void)
 	SDL_DisplayMode display_mode;
 	int fullScreenWidth, fullScreenHeight;
 
-	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
-		fprintf(stderr, "Error initializing SDL.\n");
-		return (false);
+		fprintf(stderr, "Error initializing SDL: %s\n", SDL_GetError());
+		return false;
 	}
-	SDL_GetCurrentDisplayMode(0, &display_mode);
+
+	if (SDL_GetCurrentDisplayMode(0, &display_mode) != 0)
+	{
+		fprintf(stderr, "Error getting display mode: %s\n", SDL_GetError());
+		SDL_Quit();
+		return false;
+	}
+
 	fullScreenWidth = display_mode.w;
 	fullScreenHeight = display_mode.h;
+
 	window = SDL_CreateWindow(
 		NULL,
 		SDL_WINDOWPOS_CENTERED,
@@ -31,28 +39,68 @@ bool initializeWindow(void)
 		fullScreenHeight,
 		SDL_WINDOW_BORDERLESS
 	);
+
 	if (!window)
 	{
-		fprintf(stderr, "Error creating SDL window.\n");
-		return (false);
+		fprintf(stderr, "Error creating SDL window: %s\n", SDL_GetError());
+		SDL_Quit();
+		return false;
 	}
-	renderer = SDL_CreateRenderer(window, -1, 1);
+
+	renderer = SDL_CreateRenderer(
+		window,
+		-1,
+		SDL_RENDERER_ACCELERATED
+	);
+
 	if (!renderer)
 	{
-		fprintf(stderr, "Error creating SDL renderer.\n");
-		return (false);
+		fprintf(stderr, "Error creating SDL renderer: %s\n", SDL_GetError());
+		SDL_DestroyWindow(window);
+		SDL_Quit();
+		return false;
 	}
-	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
-	/* allocate the total amount of bytes in memory to hold our colorbuffer */
+	if (SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND) != 0)
+	{
+		fprintf(stderr, "Error setting blend mode: %s\n", SDL_GetError());
+		SDL_DestroyRenderer(renderer);
+		SDL_DestroyWindow(window);
+		SDL_Quit();
+		return false;
+	}
+
 	colorBuffer = malloc(sizeof(color_t) * SCREEN_WIDTH * SCREEN_HEIGHT);
+	if (!colorBuffer)
+	{
+		fprintf(stderr, "Error allocating memory for color buffer\n");
+		SDL_DestroyRenderer(renderer);
+		SDL_DestroyWindow(window);
+		SDL_Quit();
+		return false;
+	}
 
-	/* create an SDL_Texture to display the colorbuffer */
-	colorBufferTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32,
-		SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
+	colorBufferTexture = SDL_CreateTexture(
+		renderer,
+		SDL_PIXELFORMAT_RGBA32,
+		SDL_TEXTUREACCESS_STREAMING,
+		SCREEN_WIDTH,
+		SCREEN_HEIGHT
+	);
 
-	return (true);
+	if (!colorBufferTexture)
+	{
+		fprintf(stderr, "Error creating SDL texture: %s\n", SDL_GetError());
+		free(colorBuffer);
+		SDL_DestroyRenderer(renderer);
+		SDL_DestroyWindow(window);
+		SDL_Quit();
+		return false;
+	}
+
+	return true;
 }
+
 
 /**
  * destroyWindow - destroy window when the game is over
