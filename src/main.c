@@ -54,6 +54,7 @@ void update_game(void)
 
 void render_game(void)
 {
+	printf("Rendering.\n");
 	clearColorBuffer(0xFF000000);
 
 	renderWall();
@@ -63,6 +64,7 @@ void render_game(void)
 	renderPlayer();
 
 	renderColorBuffer();
+	printf("Done rendering....\n");
 }
 
 /**
