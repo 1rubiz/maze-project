@@ -14,6 +14,7 @@ bool initializeWindow(void)
 {
 	SDL_DisplayMode display_mode;
 	int fullScreenWidth, fullScreenHeight;
+	printf("Initializing SDL.\n");
 
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
