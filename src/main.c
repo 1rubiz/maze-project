@@ -84,17 +84,24 @@ void destroy_game(void)
 
 int main(void)
 {
-	printf("Attempting to initialize SDL.\n");
-	GameRunning = initializeWindow();
+    printf("Attempting to initialize SDL.\n");
 
-	setup_game();
+    // Initialize SDL and setup game; exit if initialization fails
+    if (!(GameRunning = initializeWindow())) {
+        return (1);
+    }
 
-	while (GameRunning)
-	{
-		handleInput();
-		update_game();
-		render_game();
-	}
-	destroy_game();
-	return (0);
+    setup_game();
+
+    // Main game loop
+    while (GameRunning)
+    {
+        handleInput();
+        update_game();
+        render_game();
+    }
+
+    // Clean up and exit
+    destroy_game();
+    return (0);
 }
